@@ -8,15 +8,13 @@ RUN apt-get update && \
 COPY . .
 RUN cargo build --release
 
-FROM debian:12.0-slim AS prod
-RUN apt-get update  && \
-    apt-get install -y ca-certificates libssl-dev --no-install-recommends && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
-    rm -rf /tmp/* /var/tmp/*
+FROM alpine:3.18.2 AS prod
+RUN apk update && \
+    apk add --no-cache ca-certificates openssl-dev && \
+    rm -rf /var/cache/apk/*
 WORKDIR /app
 COPY --from=build /build/target/release/webhookstuff .
-RUN adduser --disabled-password appuser
+RUN adduser -D -s /bin/sh appuser
 USER appuser
 ENV RUST_LOG=info
 ENTRYPOINT [ "./webhookstuff" ]
