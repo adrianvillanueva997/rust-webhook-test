@@ -19,6 +19,6 @@ WORKDIR /app
 COPY --from=build /build/target/release/webhookstuff .
 RUN adduser --disabled-password appuser
 USER appuser
-ENV RUST_LOG=info
+ENV RUST_LOG=debug
 EXPOSE 80
 ENTRYPOINT [ "./webhookstuff" ]
