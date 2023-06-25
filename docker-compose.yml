@@ -1,0 +1,26 @@
+version: "3.0"
+services:
+  web:
+    image: ghcr.io/adrianvillanueva997/rust-webhook-test:latest
+    networks:
+      - proxy
+    container_name: webhook-test
+    restart: unless-stopped
+    labels:
+      - com.ouroboros.enable=true
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.avm-redirect-websecure.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.avm-redirect-websecure.redirectscheme.permanent=true"
+      - "traefik.http.routers.avm-web.middlewares=avm-redirect-websecure"
+      - traefik.http.routers.avm-web.rule=Host(`webhook.thexiao77.com`)
+      - traefik.http.routers.avm-web.entrypoints=http
+      - traefik.http.routers.avm-websecure.rule=Host(`webhook.thexiao77.com`)
+      - traefik.http.routers.avm-websecure.tls.certresolver=le
+      - traefik.http.routers.avm-websecure.tls=true
+      - traefik.http.routers.avm-websecure.entrypoints=https
+      - "traefik.docker.network=proxy"
+    env_file:
+      - .env
+networks:
+  proxy:
+    external: true
