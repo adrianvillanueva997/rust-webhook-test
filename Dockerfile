@@ -8,8 +8,8 @@ RUN apt-get update && \
 COPY . .
 RUN cargo build --release
 
-FROM debian:12.0-slim AS prod
-RUN apt-get update  && \
+FROM ubuntu:22.04 AS prod
+RUN apt-get update && \
     apt-get install -y apt-utils ca-certificates pkg-config libssl-dev --no-install-recommends && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
