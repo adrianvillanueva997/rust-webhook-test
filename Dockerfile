@@ -15,7 +15,7 @@ RUN apt-get update  && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf /tmp/* /var/tmp/*
 WORKDIR /app
-COPY --from=build /build/target/release/telegrambot_ukranian .
+COPY --from=build /build/target/release/webhookstuff .
 RUN adduser --disabled-password appuser
 USER appuser
 ENV RUST_LOG=info
