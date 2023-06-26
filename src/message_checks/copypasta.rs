@@ -22,25 +22,27 @@ const PASTA_WORDS: [&str; 19] = [
     "euskadi",
 ];
 
-fn pasta_check(message: &str) -> Vec<String> {
-    let mut checks = Vec::new();
-    for i in 0..PASTA_WORDS.len() {
-        let regex_pattern = format!(r"\b{}\b", PASTA_WORDS[i]);
-        let regex = Regex::new(&regex_pattern).unwrap();
-        if regex.is_match(message) {
-            checks.push(PASTA_WORDS[i].to_owned());
-        }
-    }
-    checks
+pub async fn pasta_check(message: &str) -> Vec<String> {
+    PASTA_WORDS
+        .iter()
+        .filter_map(|word| {
+            let regex_pattern = format!(r"\b{}\b", word);
+            let regex = Regex::new(&regex_pattern).unwrap();
+            if regex.is_match(message) {
+                Some(String::from(word.to_owned()))
+            } else {
+                None
+            }
+        })
+        .collect()
 }
 
-pub fn find_copypasta(input: &str) -> Vec<String> {
-    let words = pasta_check(input);
-    let mut message: Vec<String> = Vec::new();
-    for i in 0..words.len() {
-        message.push(String::from(copypastas(&words[i])));
-    }
-    message
+pub async fn find_copypasta(input: &str) -> Vec<String> {
+    let words = pasta_check(input).await;
+    words
+        .iter()
+        .map(|word| copypastas(word).to_string())
+        .collect()
 }
 
 fn copypastas(word: &str) -> &str {

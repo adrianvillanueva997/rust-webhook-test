@@ -30,7 +30,7 @@ async fn process_text_messages(bot: Bot, msg: Message) -> Result<(), Box<dyn std
         }
 
         let copypastas = message_checks::copypasta::find_copypasta(&message);
-        for copypasta in copypastas {
+        for copypasta in copypastas.await {
             actions.push(
                 bot.send_message(msg.chat.id, copypasta)
                     .reply_to_message_id(msg.id),
