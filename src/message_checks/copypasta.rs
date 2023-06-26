@@ -1,6 +1,6 @@
 use regex::Regex;
 
-const PASTA_WORDS: [&str; 18] = [
+const PASTA_WORDS: [&str; 19] = [
     "cbt",
     "lentejas",
     "pan",
@@ -19,6 +19,7 @@ const PASTA_WORDS: [&str; 18] = [
     "bicho",
     "amogus",
     "china",
+    "euskadi",
 ];
 
 fn pasta_check(message: &str) -> Vec<String> {
@@ -72,6 +73,7 @@ fn copypastas(word: &str) -> &str {
 为党争光! Glory to the CCP!",
         "halloween" => "Qué es Jalogüin??",
         "amiga" => "\"amiga\"",
+        "euskadi" => "el ojo de",
         _ => ""
 
     }
