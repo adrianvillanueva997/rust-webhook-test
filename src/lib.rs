@@ -1,5 +1,6 @@
 use std::convert::Infallible;
 
+use message_checks::bad_words;
 use teloxide::payloads::SendMessageSetters;
 use teloxide::requests::Requester;
 use teloxide::types::Message;
@@ -15,20 +16,32 @@ pub async fn parse_messages(
     teloxide::repl_with_listener(
         bot,
         |bot: Bot, msg: Message| async move {
-            if msg.text().is_none() {
+            if let Some(video) = msg.video() {
+                bot.send_chat_action(msg.chat.id, teloxide::types::ChatAction::UploadVideo)
+                    .await?;
+                bot.send_message(msg.chat.id, "Video detected")
+                    .reply_to_message_id(msg.id)
+                    .await?;
                 return Ok(());
             }
-            let message_text = msg.text().unwrap_or_default();
-            if message_checks::url::is_url(message_text) {
-                bot.send_message(msg.chat.id, "URL detected")
-                    .reply_to_message_id(msg.id)
-                    .await?;
-            }
 
-            if msg.text().unwrap() == "ping" {
-                bot.send_message(msg.chat.id, "pong")
-                    .reply_to_message_id(msg.id)
-                    .await?;
+            if let Some(text) = msg.text() {
+                let message = text.to_string().to_lowercase();
+                if message_checks::url::is_url(&message) {
+                    bot.send_chat_action(msg.chat.id, teloxide::types::ChatAction::Typing)
+                        .await?;
+                    bot.send_message(msg.chat.id, "URL detected")
+                        .reply_to_message_id(msg.id)
+                        .await?;
+                    // return Ok(());
+                }
+                if bad_words::find_bad_words(&message).await {
+                    bot.send_chat_action(msg.chat.id, teloxide::types::ChatAction::Typing)
+                        .await?;
+                    bot.send_message(msg.chat.id, "deficiente")
+                        .reply_to_message_id(msg.id)
+                        .await?;
+                }
             }
 
             Ok(())

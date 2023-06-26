@@ -9,9 +9,9 @@ async fn main() {
     let addr = ([0, 0, 0, 0], 80).into();
     let url = env::var("url").expect("URL is not set");
     let url = Url::from_str(&url).unwrap();
-    let listener = webhooks::axum(bot.clone(), webhooks::Options::new(addr, url))
+    let listener = webhooks::axum(bot.clone(), webhooks::Options::new(addr, url.clone()))
         .await
         .expect("Couldn't setup webhook");
-    info!("Running on {}", addr);
+    info!("Running on {} {}", url, addr);
     webhookstuff::parse_messages(bot, listener).await;
 }
