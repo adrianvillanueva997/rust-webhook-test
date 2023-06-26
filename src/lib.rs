@@ -38,9 +38,19 @@ pub async fn parse_messages(
                 if bad_words::find_bad_words(&message).await {
                     bot.send_chat_action(msg.chat.id, teloxide::types::ChatAction::Typing)
                         .await?;
-                    bot.send_message(msg.chat.id, "deficiente")
+                    bot.send_message(msg.chat.id, "Deficiente")
                         .reply_to_message_id(msg.id)
                         .await?;
+                }
+                let copypastas = message_checks::copypasta::find_copypasta(&message);
+                if !copypastas.is_empty() {
+                    bot.send_chat_action(msg.chat.id, teloxide::types::ChatAction::Typing)
+                        .await?;
+                    for copypasta in copypastas {
+                        bot.send_message(msg.chat.id, copypasta)
+                            .reply_to_message_id(msg.id)
+                            .await?;
+                    }
                 }
             }
 
