@@ -9,6 +9,7 @@ COPY . .
 RUN cargo build --release
 
 FROM ubuntu:22.04 AS prod
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN echo "deb http://security.ubuntu.com/ubuntu focal-security main" | tee /etc/apt/sources.list.d/focal-security.list
 RUN apt-get update && \
     apt-get install -y apt-utils ca-certificates pkg-config libssl-dev libssl1.1 --no-install-recommends && \
