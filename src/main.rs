@@ -2,6 +2,11 @@ use log::info;
 use std::{env, str::FromStr};
 use teloxide::{update_listeners::webhooks, Bot};
 use url::Url;
+
+// use crate::routines::{birthdays::birthday_routine, thursday::happy_thursday_routine};
+
+mod routines;
+
 #[tokio::main]
 async fn main() {
     pretty_env_logger::init();
@@ -13,5 +18,8 @@ async fn main() {
         .await
         .expect("Couldn't setup webhook");
     info!("Running on {} {}", url, addr);
+    let _ = tokio::spawn(routines::birthdays::birthday_routine(bot.to_owned()));
+    let _ = tokio::spawn(routines::thursday::happy_thursday_routine(bot.to_owned()));
+
     webhookstuff::parse_messages(bot, listener).await;
 }
