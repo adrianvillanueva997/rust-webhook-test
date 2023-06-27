@@ -1,5 +1,5 @@
+use rayon::prelude::*;
 use regex::Regex;
-
 const PASTA_WORDS: [&str; 19] = [
     "cbt",
     "lentejas",
@@ -24,7 +24,7 @@ const PASTA_WORDS: [&str; 19] = [
 
 pub async fn pasta_check(message: &str) -> Vec<String> {
     PASTA_WORDS
-        .iter()
+        .par_iter()
         .filter_map(|word| {
             let regex_pattern = format!(r"\b{}\b", word);
             let regex = Regex::new(&regex_pattern).unwrap();
@@ -40,7 +40,7 @@ pub async fn pasta_check(message: &str) -> Vec<String> {
 pub async fn find_copypasta(input: &str) -> Vec<String> {
     let words = pasta_check(input).await;
     words
-        .iter()
+        .par_iter()
         .map(|word| copypastas(word).to_string())
         .collect()
 }

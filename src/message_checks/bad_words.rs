@@ -2,7 +2,6 @@ use lazy_static::lazy_static;
 use regex::Regex;
 use tokio::task;
 
-// const UWU_EXPR: &'static str = "\\W*((?i)%s(?-i))\\W*";
 const BAD_WORDS: &str = r#"\W*((?i)(uwu|:v|:3|owo)(?-i))\W*"#;
 
 lazy_static! {
