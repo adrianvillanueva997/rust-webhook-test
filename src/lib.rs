@@ -16,6 +16,14 @@ async fn process_text_messages(bot: Bot, msg: Message) -> Result<(), Box<dyn std
         let mut actions: Vec<_> = Vec::new();
 
         if message_checks::url::is_url(&message) {
+            let twitter = message_checks::twitter::update_vxtwitter(&message).await;
+            if !twitter.is_empty() {
+                bot.delete_message(msg.chat.id, msg.id).await?;
+                actions.push(
+                    bot.send_message(msg.chat.id, twitter)
+                        .reply_to_message_id(msg.id),
+                );
+            }
             actions.push(
                 bot.send_message(msg.chat.id, "URL detected")
                     .reply_to_message_id(msg.id),
