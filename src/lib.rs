@@ -1,4 +1,5 @@
 use std::convert::Infallible;
+use std::time::Duration;
 
 use log::error;
 use message_checks::bad_words;
@@ -7,6 +8,7 @@ use teloxide::requests::Requester;
 use teloxide::types::Message;
 use teloxide::update_listeners::UpdateListener;
 use teloxide::Bot;
+use tokio::time::sleep;
 
 mod message_checks;
 
@@ -51,6 +53,7 @@ async fn process_text_messages(bot: Bot, msg: Message) -> Result<(), Box<dyn std
             tokio::join!(async {
                 for action in actions {
                     action.await.unwrap();
+                    sleep(Duration::from_millis(50)).await;
                 }
             });
         }
@@ -59,16 +62,6 @@ async fn process_text_messages(bot: Bot, msg: Message) -> Result<(), Box<dyn std
     Ok(())
 }
 
-async fn process_video_messages(bot: Bot, msg: Message) -> Result<(), Box<dyn std::error::Error>> {
-    if let Some(video) = msg.video() {
-        bot.send_chat_action(msg.chat.id, teloxide::types::ChatAction::UploadVideo)
-            .await?;
-        bot.send_message(msg.chat.id, "Video detected")
-            .reply_to_message_id(msg.id)
-            .await?;
-    }
-    Ok(())
-}
 pub async fn parse_messages(bot: Bot, listener: impl UpdateListener<Err = Infallible> + Send) {
     teloxide::repl_with_listener(
         bot,
@@ -76,11 +69,6 @@ pub async fn parse_messages(bot: Bot, listener: impl UpdateListener<Err = Infall
             if let Err(err) = process_text_messages(bot.clone(), msg.clone()).await {
                 error!("Error processing text messages: {}", err);
             }
-
-            if let Err(err) = process_video_messages(bot.clone(), msg.clone()).await {
-                error!("Error processing video messages: {}", err);
-            }
-
             Ok(())
         },
         listener,
