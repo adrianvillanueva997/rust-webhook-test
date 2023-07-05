@@ -1,12 +1,10 @@
-pub async fn update_vxtwitter(message: &str) -> String {
-    //TODO: Optmize this function
-    if message.contains("fxtwitter") || message.contains("vxtwitter") {
-        return String::from("");
+pub async fn update_vxtwitter(message: &str) -> Option<String> {
+    if (message.contains("twitter") && message.contains("status"))
+        && !(message.contains("fxtwitter") || message.contains("vxtwitter"))
+    {
+        let url = message.replace("twitter", "fxtwitter");
+        return Some(url);
     }
-    if message.contains("twitter") && message.contains("status") {
-        let url = message.replace("twitter", "vxtwitter");
 
-        return url;
-    }
-    return String::from("");
+    None
 }

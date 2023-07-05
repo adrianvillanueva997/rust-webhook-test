@@ -19,17 +19,10 @@ async fn process_text_messages(bot: Bot, msg: Message) -> Result<(), Box<dyn std
 
         if message_checks::url::is_url(&message) {
             let twitter = message_checks::twitter::update_vxtwitter(&message).await;
-            if !twitter.is_empty() {
+            if let Some(twitter) = twitter {
                 bot.delete_message(msg.chat.id, msg.id).await?;
-                actions.push(
-                    bot.send_message(msg.chat.id, twitter)
-                        .reply_to_message_id(msg.id),
-                );
+                actions.push(bot.send_message(msg.chat.id, twitter));
             }
-            actions.push(
-                bot.send_message(msg.chat.id, "URL detected")
-                    .reply_to_message_id(msg.id),
-            );
         }
 
         if bad_words::find_bad_words(&message).await {
