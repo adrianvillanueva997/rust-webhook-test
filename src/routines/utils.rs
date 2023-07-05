@@ -1,7 +1,8 @@
 use chrono::{Datelike, Duration, Local};
 use log::info;
 
-pub const GROUP_ID: i64 = -1063900471;
+// pub const GROUP_ID: i64 = -1063900471;
+pub const GROUP_ID: i64 = -281597102;
 
 pub fn get_todays_date() -> (i32, u32, u32) {
     let current_date = chrono::Utc::now().date_naive();
