@@ -83,15 +83,17 @@ fn special_event() -> &'static str {
 }
 
 pub async fn birthday_routine(bot: Bot) {
-    info!("Starting thursday routine");
+    info!("Starting birthday routine");
     loop {
         info!("Calculating next midnight");
         let sleep_seconds = calculate_next_midnight();
         time::sleep(Duration::from_secs(sleep_seconds)).await;
+
         info!("Running special event routine");
-        let event = special_event();
-        if !event.is_empty() {
-            let _ = bot.send_message(ChatId(GROUP_ID), event).await;
+        match special_event() {
+            event => {
+                let _ = bot.send_message(ChatId(GROUP_ID), event).await;
+            }
         }
     }
 }
