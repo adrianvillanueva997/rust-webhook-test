@@ -22,4 +22,9 @@ RUN adduser --disabled-password appuser
 USER appuser
 ENV RUST_LOG=debug
 EXPOSE 80
+
+USER root
+RUN chown -R appuser:appuser /app
+USER appuser
+
 ENTRYPOINT [ "./webhookstuff" ]
