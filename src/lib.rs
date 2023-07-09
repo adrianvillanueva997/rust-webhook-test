@@ -12,7 +12,7 @@ use tokio::time::sleep;
 
 mod message_checks;
 
-async fn process_text_messages(bot: Bot, msg: Message) -> Result<(), Box<dyn std::error::Error>> {
+async fn process_text_messages(bot: &Bot, msg: &Message) -> Result<(), Box<dyn std::error::Error>> {
     if let Some(text) = msg.text() {
         let message = text.to_lowercase();
         let mut actions: Vec<_> = Vec::new();
@@ -22,6 +22,27 @@ async fn process_text_messages(bot: Bot, msg: Message) -> Result<(), Box<dyn std
             if let Some(twitter) = twitter {
                 bot.delete_message(msg.chat.id, msg.id).await?;
                 actions.push(bot.send_message(msg.chat.id, twitter));
+            } else if message_checks::webm::url_is_webm(&message) {
+                if message_checks::webm::check_url_status_code(&message).await == Some(200) {
+                    bot.send_chat_action(msg.chat.id, teloxide::types::ChatAction::UploadVideo)
+                        .await?;
+                    message_checks::webm::download_webm(&message).await;
+                    message_checks::webm::convert_webm_to_mp4();
+                    bot.send_video(
+                        msg.chat.id,
+                        teloxide::types::InputFile::file(std::path::Path::new(
+                            message_checks::webm::MP4,
+                        )),
+                    )
+                    .await?;
+                    message_checks::webm::delete_webm().await;
+                    message_checks::webm::delete_mp4().await;
+                } else {
+                    actions.push(
+                        bot.send_message(msg.chat.id, "El video no existe :(")
+                            .reply_to_message_id(msg.id),
+                    );
+                }
             }
         }
 
@@ -58,8 +79,8 @@ async fn process_text_messages(bot: Bot, msg: Message) -> Result<(), Box<dyn std
 pub async fn parse_messages(bot: Bot, listener: impl UpdateListener<Err = Infallible> + Send) {
     teloxide::repl_with_listener(
         bot,
-        |bot: Bot, msg: Message| async move {
-            if let Err(err) = process_text_messages(bot.clone(), msg.clone()).await {
+        |bot, msg| async move {
+            if let Err(err) = process_text_messages(&bot, &msg).await {
                 error!("Error processing text messages: {}", err);
             }
             Ok(())
