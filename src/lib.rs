@@ -23,7 +23,12 @@ async fn process_text_messages(bot: &Bot, msg: &Message) -> Result<(), Box<dyn s
                 bot.delete_message(msg.chat.id, msg.id).await?;
                 actions.push(bot.send_message(msg.chat.id, twitter));
             } else if message_checks::webm::url_is_webm(&message) {
-                if message_checks::webm::check_url_status_code(&message).await == Some(200) {
+                if message_checks::webm::check_url_status_code(&message).await != Some(200) {
+                    actions.push(
+                        bot.send_message(msg.chat.id, "El video no existe :(")
+                            .reply_to_message_id(msg.id),
+                    );
+                } else {
                     bot.send_chat_action(msg.chat.id, teloxide::types::ChatAction::UploadVideo)
                         .await?;
                     message_checks::webm::download_webm(&message).await;
@@ -37,11 +42,6 @@ async fn process_text_messages(bot: &Bot, msg: &Message) -> Result<(), Box<dyn s
                     .await?;
                     message_checks::webm::delete_webm().await;
                     message_checks::webm::delete_mp4().await;
-                } else {
-                    actions.push(
-                        bot.send_message(msg.chat.id, "El video no existe :(")
-                            .reply_to_message_id(msg.id),
-                    );
                 }
             }
         }
@@ -67,7 +67,7 @@ async fn process_text_messages(bot: &Bot, msg: &Message) -> Result<(), Box<dyn s
             tokio::join!(async {
                 for action in actions {
                     action.await.unwrap();
-                    sleep(Duration::from_millis(50)).await;
+                    sleep(Duration::from_secs(1)).await;
                 }
             });
         }
