@@ -35,7 +35,7 @@ pub fn url_is_webm(url: &str) -> bool {
     url.ends_with(".webm")
 }
 
-pub fn convert_webm_to_mp4() {
+pub async fn convert_webm_to_mp4() {
     Command::new("ffmpeg")
         .arg("-i")
         .arg(WEBM)
@@ -50,4 +50,12 @@ pub async fn delete_webm() {
 
 pub async fn delete_mp4() {
     std::fs::remove_file(MP4).expect("Failed to delete mp4");
+}
+
+pub async fn webm_exists() -> bool {
+    std::path::Path::new(WEBM).exists()
+}
+
+pub async fn mp4_exists() -> bool {
+    std::path::Path::new(MP4).exists()
 }

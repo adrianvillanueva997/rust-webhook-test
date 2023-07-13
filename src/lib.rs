@@ -2,7 +2,7 @@ use std::convert::Infallible;
 use std::time::Duration;
 
 use log::error;
-use message_checks::bad_words;
+use message_checks::{bad_words, webm};
 use teloxide::payloads::SendMessageSetters;
 use teloxide::requests::Requester;
 use teloxide::types::Message;
@@ -29,10 +29,16 @@ async fn process_text_messages(bot: &Bot, msg: &Message) -> Result<(), Box<dyn s
                             .reply_to_message_id(msg.id),
                     );
                 } else {
+                    if webm::webm_exists().await {
+                        webm::delete_webm().await;
+                    }
+                    if webm::mp4_exists().await {
+                        webm::delete_mp4().await;
+                    }
                     bot.send_chat_action(msg.chat.id, teloxide::types::ChatAction::UploadVideo)
                         .await?;
                     message_checks::webm::download_webm(&message).await;
-                    message_checks::webm::convert_webm_to_mp4();
+                    message_checks::webm::convert_webm_to_mp4().await;
                     bot.send_video(
                         msg.chat.id,
                         teloxide::types::InputFile::file(std::path::Path::new(
@@ -40,8 +46,6 @@ async fn process_text_messages(bot: &Bot, msg: &Message) -> Result<(), Box<dyn s
                         )),
                     )
                     .await?;
-                    message_checks::webm::delete_webm().await;
-                    message_checks::webm::delete_mp4().await;
                 }
             }
         }
