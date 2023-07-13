@@ -1,24 +1,48 @@
-use rayon::prelude::*;
-use regex::Regex;
+use rayon::prelude::{IntoParallelRefIterator, ParallelIterator};
 
-lazy_static::lazy_static! {
-    static ref REGEX_PATTERN: Regex = {
-        let words = [
-            "cbt", "lentejas", "pan", "colegas", "amiga", "gimnasio", "conciencia",
-            "paraguaya", "paja", "cuerpazo", "halloween", "niño", "ayuso", "prepucio",
-            "bicho", "amogus", "china", "euskadi", "69", "pan", "spiderman", "viernes",
-            "anime", "hetero", "tetas", "profe", "peruano", "abogado"
-        ];
-        let pattern = words.iter().map(|word| format!(r"\b{}\b", word)).collect::<Vec<_>>().join("|");
-        Regex::new(&pattern).unwrap()
-    };
-}
+static WORDS: &'static [&str] = &[
+    "cbt",
+    "lentejas",
+    "pan",
+    "colegas",
+    "amiga",
+    "gimnasio",
+    "conciencia",
+    "paraguaya",
+    "paja",
+    "cuerpazo",
+    "halloween",
+    "niño",
+    "ayuso",
+    "prepucio",
+    "bicho",
+    "amogus",
+    "china",
+    "euskadi",
+    "69",
+    "pan",
+    "spiderman",
+    "viernes",
+    "anime",
+    "hetero",
+    "tetas",
+    "profe",
+    "peruano",
+    "abogado",
+];
 
 pub async fn find_matching_words(sentence: &str) -> Vec<String> {
     let mut matching_words = Vec::new();
-    for capture in REGEX_PATTERN.captures_iter(sentence) {
-        matching_words.push(capture[0].to_string());
+    let splitted_sentence = sentence.split_whitespace().collect::<Vec<_>>();
+    for token in splitted_sentence {
+        println!("{}", token);
+        for word in WORDS {
+            if token.to_lowercase().contains(word) {
+                matching_words.push(word.to_string());
+            }
+        }
     }
+
     matching_words
 }
 
@@ -67,7 +91,7 @@ fn copypastas(word: &str) -> &str {
         "viernes" => "Preparate la puta que te re pario porque Los viernes de la jungla serán a todo ojete Todo ojete todo ojete (Coro) Ojete, ojete, ojete Para vivir una noche con las mejores putas de la zona No te la puedes perder hijo de re mil Porque si no estás allí; Andate a la concha de la lora Te esperamos para que vivas una noche de la puta madre",
         "anime" => "El anime es de otakus y pringaos que no tienen nada más que hacer que sucumbir al escapismo de dibujos de personajes en 2D. Los consumidores de anime NO tienen derechos y debería recaer sobre ellos todo el peso de la ley. Si tienes avatar de anime tu opinión no solo no cuenta, si no que voy a pensar automáticamente lo contrario de lo que me digas. En definitiva el anime es basura y fumarlo es de idiotas.",
         "hetero" => "omgg, eres hetero???😍😍😳 Siempre quise un amigo😅 hetero🤣, yo tengo un conocido hetero🧐, telo presento alomejor y se gustan pq son 😳😳heteros😳😳fifa, fútbol🤭🤭, violencia intrafamiliar😘😘, 😏😏misoginia, 🤗🤗peluches de Stich, golpear paredes 😳",
-        "tetas" => "Tetas, tetitas, tetazas, tetorras, tetotas, tetarracas, tetacas, tetuzas, teturras, tetungas, tetillas, bufas, bufarras, bufarracas, bufoncias, mamelungas, mamelones, melones, domingas, bubalongas, babongas, pechugas, peras, peritas, perolas, mamellas, tetolas, gemelas, maracas, bazucas, petacas.",
+        "tetas" => "Tetitas, tetazas, tetorras, tetotas, tetarracas, tetacas, tetuzas, teturras, tetungas, tetillas, bufas, bufarras, bufarracas, bufoncias, mamelungas, mamelones, melones, domingas, bubalongas, babongas, pechugas, peras, peritas, perolas, mamellas, tetolas, gemelas, maracas, bazucas, petacas.",
         "profe" => "Hola profe, perdón por no asistir a clases, me sucedió un problema. No sé preocupe, no fue algo grande. Bueno, si tanto insiste se lo explico, el pez de mi abuela se estaba ahogando, por lo tanto esta lo sacó de la pecera, y pues el pez se murió, se lo mató el gato. Por lo tanto, mi abuela le hizo un funeral, bueno, en realidad no hizo un funeral, el pez era algo grande, sabes? se veía rico, entonces, nos comimos al pez. Pero pasó algo raro, mi primo comenzó a convulsionar, no sé por qué. Mi primo se tiró a la piscina y empezó a nadar, se convirtió en un pez, creo. Lo íbamos a llevar al medico, pero al final no lo pudimos hacer por qué se murió, tranquila, esta vez no nos comimos al muerto. Bueno, no sabíamos donde dejar el cadáver de mi primo, entonces mi abuela propuso una idea \"si no hay cuerpo no hay muerto\" por lo tanto nos comimos a mi primo (he de decir que sabe mal, normal, estaba quemado). Bueno, enterramos los huesos para fingir que eran de un cavernicola. Funcionó, vino un arqueólogo, este se dio cuenta de que eran falsos, lo sobornamos al arqueólogo y ahora mi primo se encuentra en el museo y nosotros con mucho dinero. Por lo tanto, quiero decirle que si no me aprueba la materia, me la comeré (a usted, no a la materia) y la pondré en un museo y ganaré mucho dinero.",
         "peruano" => "Malditos peruanos, los odio, son como venezolanos pero con fetiches raros con aves. Estoy seguro de que no soy la única persona que piensa esto, odio a mi abuela peruana, a la vez la quiero, pero deseo su muerte, todo es su culpa. Maldigo el día en el que la sangre peruana se metió dentro de mi cuerpo y me infectó de por vida. Estaría dispuesto a hacerme innumerables transfusiones de sangre solo para eliminar este veneno que reside dentro de mi. Si eres peruano y estás leyendo esto, no te preocupes, prometo que algún día encontraré la cura a esta grave enfermedad.",
         "abogado" => "El que tengo aqui colgado xd",
