@@ -3,7 +3,6 @@ use rayon::prelude::{IntoParallelRefIterator, ParallelIterator};
 static WORDS: &'static [&str] = &[
     "cbt",
     "lentejas",
-    "pan",
     "colegas",
     "amiga",
     "gimnasio",
