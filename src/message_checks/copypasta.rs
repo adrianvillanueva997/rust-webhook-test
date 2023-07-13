@@ -35,7 +35,6 @@ pub async fn find_matching_words(sentence: &str) -> Vec<String> {
     let mut matching_words = Vec::new();
     let splitted_sentence = sentence.split_whitespace().collect::<Vec<_>>();
     for token in splitted_sentence {
-        println!("{}", token);
         for word in WORDS {
             if token.to_lowercase().contains(word) {
                 matching_words.push(word.to_string());
