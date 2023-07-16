@@ -2,7 +2,7 @@ use std::convert::Infallible;
 use std::time::Duration;
 
 use log::error;
-use message_checks::{bad_words, webm};
+use message_checks::{bad_words, thursday, webm};
 use teloxide::payloads::SendMessageSetters;
 use teloxide::requests::Requester;
 use teloxide::types::Message;
@@ -61,6 +61,13 @@ async fn process_text_messages(bot: &Bot, msg: &Message) -> Result<(), Box<dyn s
         for copypasta in copypastas.await {
             actions.push(
                 bot.send_message(msg.chat.id, copypasta)
+                    .reply_to_message_id(msg.id),
+            );
+        }
+
+        if thursday::is_thursday().await && thursday::check_asuka(&message).await {
+            actions.push(
+                bot.send_message(msg.chat.id, &thursday::random_message().await)
                     .reply_to_message_id(msg.id),
             );
         }
